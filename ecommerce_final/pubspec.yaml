@@ -1,0 +1,16 @@
+name: ecommerce_app
+description: A comprehensive e-commerce app in Flutter.
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.0.0
+  csv: ^5.0.0  # For loading CSV data
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/products.csv  # Add CSV file to assets
