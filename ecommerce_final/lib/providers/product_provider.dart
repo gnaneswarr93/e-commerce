@@ -13,34 +13,58 @@ class ProductProvider with ChangeNotifier {
   Map<String, CartItem> get cart => _cart;
 
   Future<void> loadProducts() async {
-    final data = await rootBundle.loadString('assets/products.csv');
-    List<List<dynamic>> csvData = CsvToListConverter().convert(data);
+    try {
+      // Load the CSV file from assets
+      final data = await rootBundle.loadString('assets/products.csv');
 
-    // Assuming the first row is the header
-    _products = csvData.skip(1).map((product) {
-      return Product(
-        id: product[0].toString(), // Ensure it's a string
-        title: product[1].toString(),
-        description: product[2].toString(),
-        price: double.parse(product[3].toString()), // Parse price to double
-        imageUrl: product[4].toString(), // Assuming there's an imageUrl as the 5th column
-      );
-    }).toList();
+      // Convert CSV data into a List<List<dynamic>>
+      List<List<dynamic>> csvData = CsvToListConverter().convert(data);
 
-    notifyListeners();
+      // Assuming the first row is the header and data starts from row 1
+      _products = csvData.skip(1).map((product) {
+        // Parse price by removing commas, then converting to double
+        double price = double.tryParse(
+            product[1].toString().replaceAll(',', '')) ?? 0.0;
+
+        return Product(
+          id: product[0].toString(), // Using name as ID here
+          title: product[0].toString(), // Product title from name column
+          description: '', // Default empty description
+          price: price, // Parsed price
+          imageUrl: product[2].toString(), // imageUrl from CSV
+        );
+      }).toList();
+
+      notifyListeners();
+    } catch (error) {
+      print('Error loading CSV data: $error');
+    }
   }
 
   void addToCart(Product product) {
-    if (_cart.containsKey(product.id)) { // Change from name to id
-      _cart[product.id]!.quantity += 1;
+    if (cart.containsKey(product.id)) {
+      cart.update(
+        product.id,
+            (existingCartItem) => CartItem(
+          productId: existingCartItem.productId,
+          name: existingCartItem.name, // Ensure this matches your CartItem model
+          imageUrl: existingCartItem.imageUrl,
+          price: existingCartItem.price,
+          quantity: existingCartItem.quantity + 1,
+        ),
+      );
     } else {
-      _cart[product.id] = CartItem(
-        productId: product.id,
-        name: product.title, // Use title for the name
-        price: product.price,
+      cart.putIfAbsent(
+        product.id,
+            () => CartItem(
+          productId: product.id,
+          name: product.title, // Match the product title to name
+          imageUrl: product.imageUrl, // Add the imageUrl here
+          price: product.price,
+          quantity: 1,
+        ),
       );
     }
-    notifyListeners();
   }
 
   void removeFromCart(String productId) {

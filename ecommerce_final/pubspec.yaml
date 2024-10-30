@@ -9,6 +9,7 @@ dependencies:
     sdk: flutter
   provider: ^6.0.0
   csv: ^5.0.0  # For loading CSV data
+  carousel_slider: ^4.0.0
 
 flutter:
   uses-material-design: true

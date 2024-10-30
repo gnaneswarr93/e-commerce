@@ -22,7 +22,17 @@ class ProductDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start, // Align items to the left
           children: [
-            Image.network(product.imageUrl, width: double.infinity, fit: BoxFit.cover),
+            // Centering the image using Center widget
+            Center(
+              child: Container(
+                width: 300, // Set your desired width here
+                height: 300, // Set your desired height here
+                child: Image.network(
+                  product.imageUrl,
+                  fit: BoxFit.cover, // Control how the image fits within the container
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(product.title, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
