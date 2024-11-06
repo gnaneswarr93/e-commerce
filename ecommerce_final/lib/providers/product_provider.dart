@@ -14,24 +14,18 @@ class ProductProvider with ChangeNotifier {
 
   Future<void> loadProducts() async {
     try {
-      // Load the CSV file from assets
       final data = await rootBundle.loadString('assets/products.csv');
-
-      // Convert CSV data into a List<List<dynamic>>
       List<List<dynamic>> csvData = CsvToListConverter().convert(data);
-
-      // Assuming the first row is the header and data starts from row 1
       _products = csvData.skip(1).map((product) {
-        // Parse price by removing commas, then converting to double
         double price = double.tryParse(
             product[1].toString().replaceAll(',', '')) ?? 0.0;
 
         return Product(
-          id: product[0].toString(), // Using name as ID here
-          title: product[0].toString(), // Product title from name column
-          description: '', // Default empty description
-          price: price, // Parsed price
-          imageUrl: product[2].toString(), // imageUrl from CSV
+          id: product[0].toString(),
+          title: product[0].toString(),
+          description: '',
+          price: price,
+          imageUrl: product[2].toString(),
         );
       }).toList();
 
@@ -42,24 +36,24 @@ class ProductProvider with ChangeNotifier {
   }
 
   void addToCart(Product product) {
-    if (cart.containsKey(product.id)) {
-      cart.update(
+    if (_cart.containsKey(product.id)) {
+      _cart.update(
         product.id,
             (existingCartItem) => CartItem(
           productId: existingCartItem.productId,
-          name: existingCartItem.name, // Ensure this matches your CartItem model
+          name: existingCartItem.name,
           imageUrl: existingCartItem.imageUrl,
           price: existingCartItem.price,
           quantity: existingCartItem.quantity + 1,
         ),
       );
     } else {
-      cart.putIfAbsent(
+      _cart.putIfAbsent(
         product.id,
             () => CartItem(
           productId: product.id,
-          name: product.title, // Match the product title to name
-          imageUrl: product.imageUrl, // Add the imageUrl here
+          name: product.title,
+          imageUrl: product.imageUrl,
           price: product.price,
           quantity: 1,
         ),
